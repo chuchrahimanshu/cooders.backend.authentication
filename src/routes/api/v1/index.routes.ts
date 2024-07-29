@@ -1,8 +1,8 @@
 // Import Section
 import express, { Router } from "express";
-import accountRouter from "./accounts.routes";
-import tokenRouter from "./tokens.routes";
-import verificationRouter from "./verifications.routes";
+import accountRouter from "./accounts/accounts.routes";
+import tokenRouter from "./tokens/tokens.routes";
+import verificationRouter from "./verifications/verifications.routes";
 
 // Configuration Section
 const router: Router = express.Router();
