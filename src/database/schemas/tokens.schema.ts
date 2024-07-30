@@ -10,6 +10,11 @@ const tokenSchema: Schema<TokenSchemaInterface> =
         required: true,
         unique: true,
       },
+      accessToken: {
+        token: String,
+        createdAt: Date,
+        expiresAt: Date,
+      },
       refreshToken: {
         token: String,
         createdAt: Date,

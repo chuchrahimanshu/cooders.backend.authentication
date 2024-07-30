@@ -61,7 +61,32 @@ export const signUp: RequestHandler = asyncHandler(
 );
 
 export const signIn: RequestHandler = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {}
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { username, password } = req.body;
+
+    const account = await Account.findOne({ username });
+    if (!account) {
+      return res
+        .status(404)
+        .json(
+          new APIError(404, "Account not found!", "Invalid Username / Password")
+        );
+    }
+
+    // TODO: CHANGE THIS WHEN ENCRYPTION IS APPLIED
+    if (password.toString() !== account.password.toString()) {
+      return res
+        .status(404)
+        .json(
+          new APIError(404, "Account not found!", "Invalid Username / Password")
+        );
+    }
+
+    // TODO: APPLY JWT AUTHENTICATION
+
+    // TODO: SEND ACCESSTOKEN IN RESPONSE
+    return res.status(200).json(new APIResponse(200, "Successfully Signed In"));
+  }
 );
 
 export const signOut: RequestHandler = asyncHandler(

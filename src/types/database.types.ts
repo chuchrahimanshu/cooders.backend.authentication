@@ -10,6 +10,11 @@ export interface AccountSchemaInterface {
 
 export interface TokenSchemaInterface {
   user: ObjectId;
+  accessToken: {
+    token: string;
+    createdAt: Date;
+    expiresAt: Date;
+  };
   refreshToken: {
     token: string;
     createdAt: Date;
