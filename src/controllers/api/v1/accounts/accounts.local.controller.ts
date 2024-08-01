@@ -114,7 +114,29 @@ export const signIn: RequestHandler = asyncHandler(
 );
 
 export const signOut: RequestHandler = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {}
+  async (req: Request, res: Response, next: NextFunction) => {
+    const account = await Account.findById(req.user?._id);
+    if (!account) {
+      return res
+        .status(401)
+        .json(new APIError(409, "Unauthorized Access Detected!"));
+    }
+
+    const token = await Token.findOne({ user: account._id });
+    if (!token) {
+      return res
+        .status(401)
+        .json(new APIError(409, "Unauthorized Access Detected!"));
+    }
+
+    token.accessToken.token = "";
+    token.refreshToken.token = "";
+    await token.save();
+
+    return res
+      .status(200)
+      .json(new APIResponse(200, "Successfully Signed Out!"));
+  }
 );
 
 export const changePassword: RequestHandler = asyncHandler(
