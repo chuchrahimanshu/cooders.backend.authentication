@@ -6,6 +6,9 @@ export interface AccountSchemaInterface {
   email: string;
   username: string;
   password: string;
+  validatePassword: (password: string) => boolean;
+  generateAccessToken: () => string;
+  generateRefreshToken: () => string;
 }
 
 export interface TokenSchemaInterface {

@@ -2,7 +2,6 @@ import { APIErrorInterface } from "src/types/handlers.types";
 
 class APIError extends Error implements APIErrorInterface {
   statusCode: number;
-  name: string;
   message: string;
   stack?: string;
   success: boolean;
@@ -10,7 +9,6 @@ class APIError extends Error implements APIErrorInterface {
 
   constructor(
     statusCode: number,
-    name: string,
     message: string,
     stack?: string,
     success: boolean = false,
@@ -18,7 +16,6 @@ class APIError extends Error implements APIErrorInterface {
   ) {
     super();
     this.statusCode = statusCode;
-    this.name = name;
     this.message = message;
     this.stack = stack;
     this.success = success;

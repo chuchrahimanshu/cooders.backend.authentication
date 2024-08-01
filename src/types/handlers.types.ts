@@ -8,7 +8,6 @@ export interface APIResponseInterface {
 
 export interface APIErrorInterface {
   statusCode: number;
-  name: string;
   message: string;
   stack?: string;
   success: boolean;

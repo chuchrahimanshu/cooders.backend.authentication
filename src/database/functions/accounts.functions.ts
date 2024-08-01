@@ -1,4 +1,4 @@
-import { accountSchema } from "../schemas/accounts.schema";
+import { accountSchema } from "../hooks/accounts.hooks";
 import bcrypt from "bcryptjs";
 import JWT from "jsonwebtoken";
 import {
