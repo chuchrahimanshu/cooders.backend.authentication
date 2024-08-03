@@ -32,6 +32,10 @@ const accountSchema: Schema<AccountSchemaInterface> =
         type: String,
         required: true,
       },
+      emailVerificationStatus: {
+        type: Boolean,
+        default: false,
+      },
     },
     {
       timestamps: true,

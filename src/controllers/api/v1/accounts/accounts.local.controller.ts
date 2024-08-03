@@ -44,7 +44,7 @@ export const signUp: RequestHandler = asyncHandler(
         .json(new APIError(500, "Something went wrong, Please try again!"));
     }
 
-    // TODO: SEND EMAIL OF SUCCESSFULL REGISTRATION
+    // TODO: SEND EMAIL OF SUCCESSFULL REGISTRATION USING WORKER THREAD
 
     return res.status(201).json(new APIResponse(201, "Successfully Signed Up"));
   }
@@ -66,6 +66,14 @@ export const signIn: RequestHandler = asyncHandler(
       return res
         .status(404)
         .json(new APIError(404, "Invalid Username / Password"));
+    }
+
+    if (!account.emailVerificationStatus) {
+      // TODO: Generate and Send Token on Email Address.
+
+      return res
+        .status(403)
+        .json(new APIError(403, "Email verification pending!"));
     }
 
     const accessToken = await account.generateAccessToken();
@@ -140,5 +148,44 @@ export const signOut: RequestHandler = asyncHandler(
 );
 
 export const changePassword: RequestHandler = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {}
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { username, password, confirmPassword } = req.body;
+
+    if (password.toString() !== confirmPassword.toString()) {
+      return res
+        .status(400)
+        .json(new APIError(400, "Password and Confirm Password didn't match."));
+    }
+
+    const account = await Account.findOne({ username });
+    if (!account) {
+      return res.status(404).json(new APIError(404, "Account not found!"));
+    }
+
+    const token = await Token.findOne({ user: account._id });
+    if (!token) {
+      return res
+        .status(403)
+        .json(new APIError(403, "User not verified to change password."));
+    }
+
+    if (!token.forgetPasswordToken.isTokenVerified) {
+      return res
+        .status(403)
+        .json(new APIError(403, "User not verified to change password."));
+    }
+
+    account.password = password;
+    await account.save();
+
+    token.forgetPasswordToken.isTokenVerified = false;
+    await token.save();
+
+    // TODO: Send an Email that you have changed the password.
+    // TODO: Also handle if user has not changed it.
+
+    return res
+      .status(200)
+      .json(new APIResponse(200, "Password updated successfully!"));
+  }
 );

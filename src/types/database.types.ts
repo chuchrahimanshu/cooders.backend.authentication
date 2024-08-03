@@ -6,6 +6,7 @@ export interface AccountSchemaInterface {
   email: string;
   username: string;
   password: string;
+  emailVerificationStatus: boolean;
   validatePassword: (password: string) => boolean;
   generateAccessToken: () => string;
   generateRefreshToken: () => string;
