@@ -13,3 +13,16 @@ export interface APIErrorInterface {
   success: boolean;
   error: boolean;
 }
+
+export interface NodemailerEmailInterface {
+  from: string;
+  to: string;
+  subject: string;
+  html: string;
+  attachments?: Array<{
+    filename: string;
+    path: string;
+    contentType?: string;
+  }>;
+  priority: "high" | "normal" | "low";
+}
