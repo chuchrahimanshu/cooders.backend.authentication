@@ -2,8 +2,11 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import { Account } from "src/database/models/accounts.model";
 import { Token } from "src/database/models/tokens.model";
 import { asyncHandler } from "src/handlers/async.handler";
+import { sendEmail } from "src/handlers/email.handler";
 import { APIError } from "src/handlers/error.handler";
 import { APIResponse } from "src/handlers/response.handler";
+import { NODEMAILER_EMAIL } from "src/utils/env.util";
+import { generateRandomOTP } from "src/utils/helper.util";
 
 export const signUp: RequestHandler = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -44,7 +47,17 @@ export const signUp: RequestHandler = asyncHandler(
         .json(new APIError(500, "Something went wrong, Please try again!"));
     }
 
-    // TODO: SEND EMAIL OF SUCCESSFULL REGISTRATION USING WORKER THREAD
+    const randomOTP = generateRandomOTP();
+
+    const emailResponse = await sendEmail({
+      from: NODEMAILER_EMAIL,
+      to: email,
+      subject: "Welcome to Cooders Community",
+      priority: "high",
+      html: `<h1>Welcome Email!</h1><p>${randomOTP}</p>`,
+    });
+
+    console.log(emailResponse);
 
     return res.status(201).json(new APIResponse(201, "Successfully Signed Up"));
   }
@@ -69,11 +82,35 @@ export const signIn: RequestHandler = asyncHandler(
     }
 
     if (!account.emailVerificationStatus) {
-      // TODO: Generate and Send Token on Email Address.
+      const randomOTP = generateRandomOTP();
+
+      const emailResponse = await sendEmail({
+        from: NODEMAILER_EMAIL,
+        to: account.email,
+        subject: "Email Verification Token",
+        priority: "high",
+        html: `<p>${randomOTP}</p>`,
+      });
 
       return res
         .status(403)
         .json(new APIError(403, "Email verification pending!"));
+    }
+
+    if (account.isTFAEnabled) {
+      const randomOTP = generateRandomOTP();
+
+      const emailResponse = await sendEmail({
+        from: NODEMAILER_EMAIL,
+        to: account.email,
+        subject: "Two Factor Authentication Token",
+        priority: "high",
+        html: `<p>${randomOTP}</p>`,
+      });
+
+      return res
+        .status(403)
+        .json(new APIError(403, "Verify Two Factor Authentication!"));
     }
 
     const accessToken = await account.generateAccessToken();

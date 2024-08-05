@@ -2,13 +2,17 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import { Account } from "src/database/models/accounts.model";
 import { Token } from "src/database/models/tokens.model";
 import { asyncHandler } from "src/handlers/async.handler";
+import { sendEmail } from "src/handlers/email.handler";
 import { APIError } from "src/handlers/error.handler";
 import { APIResponse } from "src/handlers/response.handler";
+import { NODEMAILER_EMAIL } from "src/utils/env.util";
 import { generateRandomOTP } from "src/utils/helper.util";
 
 export const generateTFAToken: RequestHandler = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const account = await Account.findById(req.user?._id);
+    const { username } = req.query;
+
+    const account = await Account.findOne({ username });
     if (!account) {
       return res
         .status(401)
@@ -38,7 +42,15 @@ export const generateTFAToken: RequestHandler = asyncHandler(
     token.tfaToken.expiresAt = new Date(currentTime.getTime() + 300000);
     await token.save();
 
-    // TODO: Send OTP on User Registered Email Address
+    const randomOTP = generateRandomOTP();
+
+    const emailResponse = await sendEmail({
+      from: NODEMAILER_EMAIL,
+      to: account.email,
+      subject: "Two Factor Authentication Token",
+      priority: "high",
+      html: `<p>${randomOTP}</p>`,
+    });
 
     return res
       .status(200)
@@ -52,7 +64,9 @@ export const verifyTFAToken: RequestHandler = asyncHandler(
 
 export const generateEmailVerificationToken: RequestHandler = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const account = await Account.findById(req.user?._id);
+    const { username } = req.query;
+
+    const account = await Account.findOne({ username });
     if (!account) {
       return res
         .status(401)
@@ -84,7 +98,15 @@ export const generateEmailVerificationToken: RequestHandler = asyncHandler(
     );
     await token.save();
 
-    // TODO: Send OTP on User Registered Email Address
+    const randomOTP = generateRandomOTP();
+
+    const emailResponse = await sendEmail({
+      from: NODEMAILER_EMAIL,
+      to: account.email,
+      subject: "Email Verification Token",
+      priority: "high",
+      html: `<p>${randomOTP}</p>`,
+    });
 
     return res
       .status(200)
@@ -98,7 +120,9 @@ export const verifyEmailVerificationToken: RequestHandler = asyncHandler(
 
 export const generateForgetPasswordToken: RequestHandler = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const account = await Account.findById(req.user?._id);
+    const { username } = req.query;
+
+    const account = await Account.findOne({ username });
     if (!account) {
       return res
         .status(401)
@@ -131,7 +155,15 @@ export const generateForgetPasswordToken: RequestHandler = asyncHandler(
     token.forgetPasswordToken.isTokenVerified = false;
     await token.save();
 
-    // TODO: Send OTP on User Registered Email Address
+    const randomOTP = generateRandomOTP();
+
+    const emailResponse = await sendEmail({
+      from: NODEMAILER_EMAIL,
+      to: account.email,
+      subject: "Forget Password Token",
+      priority: "high",
+      html: `<p>${randomOTP}</p>`,
+    });
 
     return res
       .status(200)

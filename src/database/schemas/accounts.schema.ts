@@ -36,6 +36,10 @@ const accountSchema: Schema<AccountSchemaInterface> =
         type: Boolean,
         default: false,
       },
+      isTFAEnabled: {
+        type: Boolean,
+        default: false,
+      },
     },
     {
       timestamps: true,
