@@ -1,3 +1,4 @@
+// Import Section
 import { accountSchema } from "../hooks/accounts.hooks";
 import bcrypt from "bcryptjs";
 import JWT from "jsonwebtoken";
@@ -8,6 +9,7 @@ import {
   JWT_REFRESH_TOKEN_SECRET,
 } from "src/utils/env.util";
 
+// Attaching Methods to Account Schema
 accountSchema.methods.validatePassword = async function (
   password: string
 ): Promise<boolean> {
@@ -37,4 +39,5 @@ accountSchema.methods.generateRefreshToken = async function () {
   );
 };
 
+// Export Account Schema
 export { accountSchema };

@@ -1,6 +1,8 @@
+// Import Section
 import { APIResponseInterface } from "src/types/handlers.types";
 
-export class APIResponse implements APIResponseInterface {
+// Response Handler Class
+class APIResponse implements APIResponseInterface {
   statusCode: number;
   message: string;
   data?: object;
@@ -21,3 +23,6 @@ export class APIResponse implements APIResponseInterface {
     this.error = error;
   }
 }
+
+// Export Section
+export { APIResponse };

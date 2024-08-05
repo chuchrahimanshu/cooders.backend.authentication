@@ -1,6 +1,8 @@
+// Import Section
 import mongoose, { Schema } from "mongoose";
 import { TokenSchemaInterface } from "src/types/database.types";
 
+// Creating Mongoose Schema
 const tokenSchema: Schema<TokenSchemaInterface> =
   new mongoose.Schema<TokenSchemaInterface>(
     {
@@ -42,4 +44,5 @@ const tokenSchema: Schema<TokenSchemaInterface> =
     }
   );
 
+// Export Section
 export { tokenSchema };

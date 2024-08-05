@@ -1,5 +1,7 @@
+// Import Section
 import { APIErrorInterface } from "src/types/handlers.types";
 
+// Error Handler Class
 class APIError extends Error implements APIErrorInterface {
   statusCode: number;
   message: string;
@@ -28,4 +30,5 @@ class APIError extends Error implements APIErrorInterface {
   }
 }
 
+// Export Section
 export { APIError };

@@ -1,6 +1,8 @@
+// Import Section
 import mongoose, { Schema } from "mongoose";
 import { AccountSchemaInterface } from "src/types/database.types";
 
+// Creating Mongoose Schema
 const accountSchema: Schema<AccountSchemaInterface> =
   new mongoose.Schema<AccountSchemaInterface>(
     {
@@ -47,4 +49,5 @@ const accountSchema: Schema<AccountSchemaInterface> =
     }
   );
 
+// Export Section
 export { accountSchema };

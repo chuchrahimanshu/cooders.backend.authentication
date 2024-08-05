@@ -1,3 +1,4 @@
+// Import Section
 import nodemailer, { Transporter } from "nodemailer";
 import {
   NODEMAILER_HOST,
@@ -6,6 +7,7 @@ import {
   NODEMAILER_USER,
 } from "src/utils/env.util";
 
+// Creating Transporter for Sending Emails
 const transporter: Transporter = nodemailer.createTransport({
   host: NODEMAILER_HOST,
   port: parseInt(NODEMAILER_PORT, 10),
@@ -15,4 +17,5 @@ const transporter: Transporter = nodemailer.createTransport({
   },
 });
 
+// Export Section
 export { transporter };

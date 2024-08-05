@@ -13,14 +13,12 @@ import {
 const router: Router = express.Router();
 
 // Unauthenticated Routes
-router.route("/creates/tfa").post(generateTFAToken);
-router.route("/validates/tfa").post(verifyTFAToken);
-router.route("/creates/email").post(generateEmailVerificationToken);
-router.route("/validates/email").post(verifyEmailVerificationToken);
-router.route("/creates/password").post(generateForgetPasswordToken);
-router.route("/validates/password").post(verifyForgetPasswordToken);
-
-// Authenticated Routes
+router.route("/creates/tfa").get(generateTFAToken);
+router.route("/validates/tfa").get(verifyTFAToken);
+router.route("/creates/email").get(generateEmailVerificationToken);
+router.route("/validates/email").get(verifyEmailVerificationToken);
+router.route("/creates/password").get(generateForgetPasswordToken);
+router.route("/validates/password").get(verifyForgetPasswordToken);
 
 // Export Section
 export default router;

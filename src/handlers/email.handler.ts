@@ -1,7 +1,9 @@
+// Import Section
 import { transporter } from "src/config/nodemailer.config";
 import nodemailer from "nodemailer";
 import { NodemailerEmailInterface } from "src/types/handlers.types";
 
+// Nodemailer Send Email Handler
 const sendEmail = async (
   options: NodemailerEmailInterface
 ): Promise<nodemailer.SentMessageInfo | void> => {
@@ -22,4 +24,5 @@ const sendEmail = async (
   }
 };
 
+// Export Section
 export { sendEmail };

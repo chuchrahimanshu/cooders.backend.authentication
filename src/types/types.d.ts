@@ -4,7 +4,7 @@ import { ObjectId } from "mongoose";
 declare global {
   namespace Express {
     interface Request {
-      user?: { _id: ObjectId };
+      user?: { _id: ObjectId; username: string };
     }
   }
 }
