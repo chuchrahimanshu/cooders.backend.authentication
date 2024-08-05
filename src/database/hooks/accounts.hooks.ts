@@ -10,6 +10,9 @@ accountSchema.pre(
     if (this.isModified("password")) {
       this.password = await encryptUsingBcrypt(this.password);
     }
+    if (this.isModified("email")) {
+      this.email = await encryptUsingBcrypt(this.email);
+    }
     next();
   }
 );
