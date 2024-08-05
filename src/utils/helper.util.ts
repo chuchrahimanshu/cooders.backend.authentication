@@ -1,3 +1,8 @@
+// Import Section
+import bcryptjs from "bcryptjs";
+import { BCRYPT_SALT_ROUNDS } from "./env.util";
+
+// Helper Functions
 export const generateRandomOTP = (): string => {
   let OTP: string = "";
 
@@ -6,4 +11,9 @@ export const generateRandomOTP = (): string => {
   }
 
   return OTP;
+};
+
+export const encryptUsingBcrypt = async (value: string) => {
+  const salt = await bcryptjs.genSalt(Number(BCRYPT_SALT_ROUNDS));
+  return await bcryptjs.hash(value, salt);
 };
