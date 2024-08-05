@@ -42,14 +42,12 @@ export const generateTFAToken: RequestHandler = asyncHandler(
     token.tfaToken.expiresAt = new Date(currentTime.getTime() + 300000);
     await token.save();
 
-    const randomOTP = generateRandomOTP();
-
     const emailResponse = await sendEmail({
       from: NODEMAILER_EMAIL,
       to: account.email,
       subject: "Two Factor Authentication Token",
       priority: "high",
-      html: `<p>${randomOTP}</p>`,
+      html: `<p>${OTP}</p>`,
     });
 
     return res
@@ -59,7 +57,68 @@ export const generateTFAToken: RequestHandler = asyncHandler(
 );
 
 export const verifyTFAToken: RequestHandler = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {}
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { username, otp } = req.query;
+
+    const account = await Account.findOne({ username });
+    if (!account) {
+      return res
+        .status(401)
+        .json(new APIError(401, "Unauthorized Access Detected!"));
+    }
+
+    const token = await Token.findOne({ user: account._id });
+    if (!token) {
+      return res
+        .status(401)
+        .json(new APIError(401, "Unauthorized Access Detected!"));
+    }
+
+    const currentTime = new Date(Date.now());
+    const otpExpireTime = new Date(token.tfaToken.expiresAt);
+
+    if (otpExpireTime < currentTime) {
+      return res
+        .status(403)
+        .json(
+          new APIError(
+            403,
+            "Please validate OTP with in 5 minutes, OTP is expired!"
+          )
+        );
+    }
+
+    if (token.tfaToken.token.toString() !== otp?.toString()) {
+      return res
+        .status(400)
+        .json(new APIError(400, "Please enter a valid OTP."));
+    }
+
+    const accessToken = await account.generateAccessToken();
+    const refreshToken = await account.generateRefreshToken();
+
+    const accessTokenExpiry = new Date(
+      currentTime.getTime() + 24 * 60 * 60 * 1000
+    );
+    const refreshTokenExpiry = new Date(
+      currentTime.getTime() + 7 * 24 * 60 * 60 * 1000
+    );
+
+    token.accessToken.token = accessToken;
+    token.accessToken.createdAt = currentTime;
+    token.accessToken.expiresAt = accessTokenExpiry;
+
+    token.refreshToken.token = refreshToken;
+    token.refreshToken.createdAt = currentTime;
+    token.refreshToken.expiresAt = refreshTokenExpiry;
+    await token.save();
+
+    return res.status(200).json(
+      new APIResponse(200, "Successfully Signed In", {
+        accessToken,
+      })
+    );
+  }
 );
 
 export const generateEmailVerificationToken: RequestHandler = asyncHandler(
@@ -98,14 +157,12 @@ export const generateEmailVerificationToken: RequestHandler = asyncHandler(
     );
     await token.save();
 
-    const randomOTP = generateRandomOTP();
-
     const emailResponse = await sendEmail({
       from: NODEMAILER_EMAIL,
       to: account.email,
       subject: "Email Verification Token",
       priority: "high",
-      html: `<p>${randomOTP}</p>`,
+      html: `<p>${OTP}</p>`,
     });
 
     return res
@@ -115,7 +172,50 @@ export const generateEmailVerificationToken: RequestHandler = asyncHandler(
 );
 
 export const verifyEmailVerificationToken: RequestHandler = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {}
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { username, otp } = req.query;
+
+    const account = await Account.findOne({ username });
+    if (!account) {
+      return res
+        .status(401)
+        .json(new APIError(401, "Unauthorized Access Detected!"));
+    }
+
+    const token = await Token.findOne({ user: account._id });
+    if (!token) {
+      return res
+        .status(401)
+        .json(new APIError(401, "Unauthorized Access Detected!"));
+    }
+
+    const currentTime = new Date(Date.now());
+    const otpExpireTime = new Date(token.emailVerificationToken.expiresAt);
+
+    if (otpExpireTime < currentTime) {
+      return res
+        .status(403)
+        .json(
+          new APIError(
+            403,
+            "Please validate OTP with in 5 minutes, OTP is expired!"
+          )
+        );
+    }
+
+    if (token.emailVerificationToken.token.toString() !== otp?.toString()) {
+      return res
+        .status(400)
+        .json(new APIError(400, "Please enter a valid OTP."));
+    }
+
+    account.emailVerificationStatus = true;
+    await account.save();
+
+    return res
+      .status(200)
+      .json(new APIResponse(200, "Email verification successfull!"));
+  }
 );
 
 export const generateForgetPasswordToken: RequestHandler = asyncHandler(
@@ -155,14 +255,12 @@ export const generateForgetPasswordToken: RequestHandler = asyncHandler(
     token.forgetPasswordToken.isTokenVerified = false;
     await token.save();
 
-    const randomOTP = generateRandomOTP();
-
     const emailResponse = await sendEmail({
       from: NODEMAILER_EMAIL,
       to: account.email,
       subject: "Forget Password Token",
       priority: "high",
-      html: `<p>${randomOTP}</p>`,
+      html: `<p>${OTP}</p>`,
     });
 
     return res
@@ -172,5 +270,48 @@ export const generateForgetPasswordToken: RequestHandler = asyncHandler(
 );
 
 export const verifyForgetPasswordToken: RequestHandler = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {}
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { username, otp } = req.query;
+
+    const account = await Account.findOne({ username });
+    if (!account) {
+      return res
+        .status(401)
+        .json(new APIError(401, "Unauthorized Access Detected!"));
+    }
+
+    const token = await Token.findOne({ user: account._id });
+    if (!token) {
+      return res
+        .status(401)
+        .json(new APIError(401, "Unauthorized Access Detected!"));
+    }
+
+    const currentTime = new Date(Date.now());
+    const otpExpireTime = new Date(token.forgetPasswordToken.expiresAt);
+
+    if (otpExpireTime < currentTime) {
+      return res
+        .status(403)
+        .json(
+          new APIError(
+            403,
+            "Please validate OTP with in 5 minutes, OTP is expired!"
+          )
+        );
+    }
+
+    if (token.forgetPasswordToken.token.toString() !== otp?.toString()) {
+      return res
+        .status(400)
+        .json(new APIError(400, "Please enter a valid OTP."));
+    }
+
+    token.forgetPasswordToken.isTokenVerified = true;
+    await token.save();
+
+    return res
+      .status(200)
+      .json(new APIResponse(200, "OTP validated successfully"));
+  }
 );
